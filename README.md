@@ -18,11 +18,14 @@ References:
 9. Plotly / Seaborn: Data visualization libraries that can be used to create sophisticated and interactive charts for stock price trends, predictions, and market analytics.
 10. AWS SageMaker: A fully managed service to quickly build, train, and deploy machine learning models, useful for scaling the Trader’s Eye model pipeline.
 
+Research Paper Citations:
+1. 1.Bal CK, Mishra RK. Stock Market Analysis and Prediction: A Bibliometric Analysis. Journal of Scientometric Research [Internet]. 2025 Mar 27;14(1):221–38. Available from: http://dx.doi.org/10.5530/jscires.20251277
+2. https://www.researchgate.net/publication/361860582_A_Study_on_Analysis_of_Stock_Prices_of_Selected_Industries
+3. Morck, Randall, Andrei Shleifer, and Robert W. Vishny. (1990). "The Stock Market and Investment: Is the Market a Sideshow?". Brookings Papers on Economic Activity, 2:1990, pp. 157-215
 
-Name:	  Name of member 1: Aradhya Shetty (2023300223)
-				Name of member 2: Anurag Singh (2023300231)
-				Name of member 3: Sumit Wadekar (2023300257)
-
-Name: Prof. Shaily Goyal shaily.goyal23@spit.ac.in
+Name:
+Name of member 1: Aradhya  Shetty
+Name of member 2: Anurag Singh 
+Name of member 3: Sumit Wadekar 
 
          
