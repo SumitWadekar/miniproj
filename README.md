@@ -24,8 +24,10 @@ Research Paper Citations:
 3. Morck, Randall, Andrei Shleifer, and Robert W. Vishny. (1990). "The Stock Market and Investment: Is the Market a Sideshow?". Brookings Papers on Economic Activity, 2:1990, pp. 157-215
 
 Name:
-Name of member 1: Aradhya  Shetty
-Name of member 2: Anurag Singh 
-Name of member 3: Sumit Wadekar 
+1: Aradhya  Shetty
+
+2: Anurag Singh 
+
+3: Sumit Wadekar 
 
          
