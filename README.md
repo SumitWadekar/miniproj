@@ -22,6 +22,7 @@ Research Paper Citations:
 1. 1.Bal CK, Mishra RK. Stock Market Analysis and Prediction: A Bibliometric Analysis. Journal of Scientometric Research [Internet]. 2025 Mar 27;14(1):221–38. Available from: http://dx.doi.org/10.5530/jscires.20251277
 2. https://www.researchgate.net/publication/361860582_A_Study_on_Analysis_of_Stock_Prices_of_Selected_Industries
 3. Morck, Randall, Andrei Shleifer, and Robert W. Vishny. (1990). "The Stock Market and Investment: Is the Market a Sideshow?". Brookings Papers on Economic Activity, 2:1990, pp. 157-215
+4. How can machine learning help stock investment?, Xin Guo
 
 Name:
 1: Aradhya  Shetty
