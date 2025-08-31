@@ -4,6 +4,7 @@ import os
 import random
 from pathlib import Path
 from typing import Tuple, List
+from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -53,7 +54,7 @@ def label_trend(close_series: pd.Series, pct: float) -> str:
 
 
 def window_indices(n: int, window: int, stride: int) -> List[Tuple[int, int]]:
-    """Return start,end (inclusive) indices for sliding windows."""
+    """Return start,end (exclusive) indices for sliding windows."""
     idxs = []
     i = 0
     while i + window <= n:
@@ -63,7 +64,6 @@ def window_indices(n: int, window: int, stride: int) -> List[Tuple[int, int]]:
 
 
 def df_to_ohlc(df: pd.DataFrame) -> pd.DataFrame:
-    # Ensure the dataframe has columns exactly: Open, High, Low, Close, Volume, indexed by Datetime
     out = df.copy()
     out["Datetime"] = pd.to_datetime(out["Datetime"])
     out = out.set_index("Datetime")
@@ -72,7 +72,6 @@ def df_to_ohlc(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def save_candle_image(ohlc_window: pd.DataFrame, path: Path, add_volume=True, style="yahoo"):
-    # mpf saves the file directly
     mpf.plot(
         ohlc_window,
         type="candle",
@@ -100,9 +99,6 @@ def build_image_dataset_from_csv(
     make_out_dirs(out_root)
 
     df = pd.read_csv(csv_path)
-    # Optional: if multiple "Unit" symbols exist, you can groupby Unit. For now treat as one series by time.
-    # If you want per-Unit windows, uncomment the groupby logic.
-
     df_ohlc = df_to_ohlc(df).sort_index()
     n = len(df_ohlc)
     idxs = window_indices(n, window, stride)
@@ -110,7 +106,7 @@ def build_image_dataset_from_csv(
     # Collect samples
     samples = []
     tmp_images_dir = out_root / "_tmp_all"
-    (tmp_images_dir).mkdir(parents=True, exist_ok=True)
+    tmp_images_dir.mkdir(parents=True, exist_ok=True)
 
     for k, (s, e) in enumerate(tqdm(idxs, desc="Generating charts")):
         win = df_ohlc.iloc[s:e]
@@ -129,12 +125,27 @@ def build_image_dataset_from_csv(
     paths = [p for p, _ in samples]
     labels = [l for _, l in samples]
 
-    # stratified split: first train+temp, then temp->val/test
-    X_train, X_temp, y_train, y_temp = train_test_split(paths, labels, test_size=(val_size + test_size),
-                                                        random_state=42, stratify=labels)
+    label_counts = Counter(labels)
+    if min(label_counts.values()) < 2:
+        print("⚠️ Warning: Some classes have <2 samples. Splitting without stratify.")
+        stratify_opt = None
+    else:
+        stratify_opt = labels
+
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        paths, labels,
+        test_size=(val_size + test_size),
+        random_state=42,
+        stratify=stratify_opt
+    )
+
     rel_test = test_size / (val_size + test_size)
-    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=rel_test,
-                                                    random_state=42, stratify=y_temp)
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp,
+        test_size=rel_test,
+        random_state=42,
+        stratify=y_temp if stratify_opt is not None else None
+    )
 
     # Move files into split/class folders
     def move_files(xs, ys, split):
@@ -143,8 +154,8 @@ def build_image_dataset_from_csv(
             os.replace(p, dest)
 
     move_files(X_train, y_train, "train")
-    move_files(X_val,   y_val,   "val")
-    move_files(X_test,  y_test,  "test")
+    move_files(X_val, y_val, "val")
+    move_files(X_test, y_test, "test")
 
     # Save meta
     meta = {
@@ -163,11 +174,9 @@ def build_image_dataset_from_csv(
     with open(out_root / "dataset_meta.json", "w") as f:
         json.dump(meta, f, indent=2)
 
-    # Clean tmp dir if empty
     try:
         tmp_images_dir.rmdir()
     except OSError:
-        # If some files remain (e.g. if you abort mid-run), ignore
         pass
 
     print("Dataset prepared at:", str(out_root))
@@ -177,7 +186,6 @@ def build_image_dataset_from_csv(
 # Training / Evaluation
 # ----------------------------
 def get_dataloaders(root: Path, img_size: int = 224, batch_size: int = 32, num_workers: int = 2):
-    # Augmentations: avoid horizontal flip (time axis), keep small rotations/zoom
     train_tfms = transforms.Compose([
         transforms.Resize((img_size, img_size)),
         transforms.RandomRotation(degrees=5),
@@ -192,12 +200,12 @@ def get_dataloaders(root: Path, img_size: int = 224, batch_size: int = 32, num_w
     ])
 
     train_ds = datasets.ImageFolder(root=str(root / "train"), transform=train_tfms)
-    val_ds   = datasets.ImageFolder(root=str(root / "val"),   transform=eval_tfms)
-    test_ds  = datasets.ImageFolder(root=str(root / "test"),  transform=eval_tfms)
+    val_ds = datasets.ImageFolder(root=str(root / "val"), transform=eval_tfms)
+    test_ds = datasets.ImageFolder(root=str(root / "test"), transform=eval_tfms)
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  num_workers=num_workers)
-    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, num_workers=num_workers)
-    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
     class_to_idx = train_ds.class_to_idx
     return train_loader, val_loader, test_loader, class_to_idx
@@ -213,15 +221,7 @@ def build_model(num_classes: int = 3):
     return model
 
 
-def train(
-    model,
-    train_loader,
-    val_loader,
-    device,
-    epochs: int = 15,
-    lr: float = 1e-4,
-    out_dir: Path = Path("artifacts")
-):
+def train(model, train_loader, val_loader, device, epochs: int = 15, lr: float = 1e-4, out_dir: Path = Path("artifacts")):
     out_dir.mkdir(parents=True, exist_ok=True)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
