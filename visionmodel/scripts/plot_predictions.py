@@ -56,7 +56,7 @@ def plot_comparison(image_path, true_labels, preds, window=100):
 
 if __name__ == "__main__":
     # Example usage
-    image = "dataset_images/test/win_00009.png"
+    image = "dataset_images/test/win_00276.png"
     labels_json = "dataset_images/test_labels.json"
 
     with open(labels_json, "r") as f:
