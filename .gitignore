@@ -1,0 +1,32 @@
+# Ignore Python cache/compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+.venv/
+
+# Ignore system/IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+
+# Ignore dataset and artifact folders
+artifacts/
+
+# Ignore model checkpoints, logs
+*.ckpt
+*.h5
+*.pth
+*.pt
+*.log
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore build/dist outputs
+dist/
+build/
