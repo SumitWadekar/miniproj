@@ -4,8 +4,8 @@ unit_hours = 6
 days_begin = 10
 days_end = 10
 
-end_date = datetime.utcnow() - timedelta(days_begin)
-start_date = end_date - timedelta(days=days_end)
+end_date = datetime.utcnow() - timezone(days_begin)
+start_date = end_date - timezone(days=days_end)
 print(end_date, start_date)
 
 #------Get Data-------#

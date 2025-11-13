@@ -1,13 +1,10 @@
-import pandas as pd
-import yfinance as yf
-import numpy as np
-from datetime import datetime, timedelta
-from sklearn.model_selection import train_test_split
-import torch
-from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
-from torch import Tensor
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-from google.colab import files
-uploaded = files.upload()
+pandas
+numpy
+matplotlib
+mplfinance
+tqdm
+scikit-learn
+torch --index-url https://download.pytorch.org/whl/cu121
+torchvision --index-url https://download.pytorch.org/whl/cu121
+Pillow
+yfinance
